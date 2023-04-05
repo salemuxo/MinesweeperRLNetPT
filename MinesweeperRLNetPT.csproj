@@ -50,6 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\Colors.cs" />
+    <Compile Include="Core\InputHandler.cs" />
     <Compile Include="Core\Map.cs" />
     <Compile Include="Core\Palette.cs" />
     <Compile Include="Core\Tile.cs" />

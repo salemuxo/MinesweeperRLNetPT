@@ -1,27 +1,32 @@
 ﻿using MinesweeperRLNetPT.Core;
 using RLNET;
+using System;
 
-namespace MinesweeperPT1
+namespace MinesweeperRLNetPT
 {
     public static class Program
     {
         // height and width in tiles
 
         // root console
-        private static readonly int _screenWidth = 48;
-        private static readonly int _screenHeight = 32;
+        private static readonly int _screenWidth = 8;
+        private static readonly int _screenHeight = 8;
         private static RLRootConsole _rootConsole;
 
         // map console
         private static readonly int _mapWidth = 8;
         private static readonly int _mapHeight = 8;
+        private static readonly int _mines = 9;
         private static RLConsole _mapConsole;
 
+        public static Random Random { get; private set; }
         public static Map Map { get; private set; }
+        public static InputHandler InputHandler { get; private set; }
 
         public static void Main()
         {
-            Map = new Map(_mapHeight, _mapWidth);
+            Random = new Random();
+            Map = new Map(_mapHeight, _mapWidth, _mines);
 
             // create root console
             string fontFileName = "terminal8x8.png";
@@ -32,9 +37,10 @@ namespace MinesweeperPT1
             // create map console
             _mapConsole = new RLConsole(_mapWidth, _mapHeight);
 
-            // set up update and render event handlers
+            // set up update and render event handlers and input handler
             _rootConsole.Update += OnRootConsoleUpdate;
             _rootConsole.Render += OnRootConsoleRender;
+            InputHandler = new InputHandler(_rootConsole);
 
             _rootConsole.Run();
         }
@@ -42,8 +48,7 @@ namespace MinesweeperPT1
         // event handler for RLNET update event
         private static void OnRootConsoleUpdate(object sender, UpdateEventArgs e)
         {
-            _mapConsole.SetBackColor(0, 0, _mapWidth, _mapHeight, Colors.Undiscovered);
-            _mapConsole.Print(1, 1, "Map", Colors.Text);
+            InputHandler.HandleInput();
         }
 
         // event handler for RLNET render event
@@ -51,8 +56,12 @@ namespace MinesweeperPT1
         {
             Map.Draw(_mapConsole);
 
+            // get centered position in root console for map and blit to root console
+            int mapCenteredX = (_screenWidth - _mapWidth) / 2;
+            int mapCenteredY = (_screenHeight - _mapHeight) / 2;
             RLConsole.Blit(_mapConsole, 0, 0, _mapWidth, 
-                _mapHeight, _rootConsole, 20, 12);
+                _mapHeight, _rootConsole, mapCenteredX, mapCenteredY);
+
             _rootConsole.Draw();
         }
     }

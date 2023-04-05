@@ -1,5 +1,7 @@
-﻿using SalemLib;
+﻿using RLNET;
+using SalemLib;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace MinesweeperRLNetPT.Core
 {
@@ -8,33 +10,56 @@ namespace MinesweeperRLNetPT.Core
         public Point Position { get; set; }
         public bool IsMine { get; set; }
         public bool IsRevealed { get; set; }
+        public bool IsFlagged { get; set; }
+        public int AdjacentMines { get; set; }
         
         public Tile(Point position)
         {
             Position = position;
+            IsRevealed = false;
+            IsMine = false;
         }
 
-        public int CountAdjacentMines(List<List<Tile>> list)
+        public int CountAdjacentMines(Map map)
         {
+            var adjacentTiles = map.GetAdjacentTiles(this);
             int mineCount = 0;
-            for (int x = -1; x <= 1; x++)
+
+            foreach (var tile in adjacentTiles)
             {
-                for (int y = -1; y <= 1; y++)
+                if (tile.IsMine)
                 {
-                    if (y == 0 && x == 0)
-                    {
-                        continue;
-                    }
-                    else
-                    {
-                        if (list[x][y].IsMine)
-                        {
-                            mineCount++;
-                        }
-                    }
+                    mineCount++;
                 }
             }
+
+            AdjacentMines = mineCount;
             return mineCount;
+        }
+
+        public void Draw(RLConsole console)
+        {
+            if (!IsRevealed)
+            {
+                SetConsoleSymbol(console, Colors.Undiscovered, 'X');
+            }
+            else if (IsMine)
+            {
+                SetConsoleSymbol(console, Colors.Mine, 'M');
+            }
+            else if (IsFlagged)
+            {
+                SetConsoleSymbol(console, Colors.Flag, 'F');
+            }
+            else
+            {
+                SetConsoleSymbol(console, RLColor.Red, (char)AdjacentMines);
+            }
+        }
+
+        public void SetConsoleSymbol(RLConsole console, RLColor color, int symbol)
+        {
+            console.Set(Position.X, Position.Y, color, Colors.Background, symbol);
         }
     }
 }
