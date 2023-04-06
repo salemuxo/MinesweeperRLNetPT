@@ -4,6 +4,7 @@ using SalemLib;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 namespace MinesweeperRLNetPT.Core
 {
@@ -19,7 +20,7 @@ namespace MinesweeperRLNetPT.Core
             Width = w; 
             Height = h;
             Mines = mines;
-            InitTiles();
+            InitMap();
         }
 
         // PUBLIC METHODS
@@ -36,7 +37,7 @@ namespace MinesweeperRLNetPT.Core
             }
         }
 
-        // 
+        // left clicked Tile -> reveal tile
         public void TileLClicked(int x, int y)
         {
             var clickedTile = Tiles[x][y];
@@ -45,25 +46,20 @@ namespace MinesweeperRLNetPT.Core
                 clickedTile.IsRevealed = true;
                 if (clickedTile.IsMine)
                 {
-
+                    Debug.WriteLine("Game Over!");
                 }
                 else
                 {
-                    //int adjacentMines = clickedTile.CountAdjacentMines(this);
-                    //if (adjacentMines == 0)
-                    //{
-                    //    var adjacentTiles = GetAdjacentTiles(clickedTile);
-                    //    foreach (var tile in adjacentTiles)
-                    //    {
+                    int adjacentMines = clickedTile.CountAdjacentMines(this);
+                    if (adjacentMines == 0)
+                    {
+                        RevealAllConnectedBlanks(clickedTile);
+                    }
+                    else
+                    {
 
-                    //    }
-                    //}
-                    //else
-                    //{
-
-                    //}
+                    }
                 }
-
             }
         }
 
@@ -71,13 +67,16 @@ namespace MinesweeperRLNetPT.Core
         public void TileRClicked(int x, int y)
         {
             var clickedTile = Tiles[x][y];
-            if (clickedTile.IsFlagged)
+            if (!clickedTile.IsRevealed)
             {
-                clickedTile.IsFlagged = false;
-            }
-            else
-            {
-                clickedTile.IsFlagged = true;
+                if (clickedTile.IsFlagged)
+                {
+                    clickedTile.IsFlagged = false;
+                }
+                else
+                {
+                    clickedTile.IsFlagged = true;
+                }
             }
         }
 
@@ -95,8 +94,14 @@ namespace MinesweeperRLNetPT.Core
                     }
                     else
                     {
-                        adjacentTiles.Add(
-                            Tiles[tile.Position.X + x][tile.Position.Y + y]);
+                        int newX = tile.Position.X + x;
+                        int newY = tile.Position.Y + y;
+                        if (newX >= 0 && newX < Width 
+                            && newY >= 0 && newY < Height)
+                        {
+                            adjacentTiles.Add(
+                            Tiles[newX][newY]);
+                        }
                     }
                 }
             }
@@ -106,7 +111,7 @@ namespace MinesweeperRLNetPT.Core
         // PRIVATE METHODS
 
         // create Tiles and Mines
-        private void InitTiles()
+        private void InitMap()
         {
             CreateTiles();
             CreateMines();
@@ -142,6 +147,72 @@ namespace MinesweeperRLNetPT.Core
                 else
                 {
                     m--;
+                }
+            }
+        }
+
+        // find all Tiles without mines or adjacent mines adjacent to Tile
+        private List<Tile> GetAdjacentBlanks(Tile Tile)
+        {
+            List<Tile> adjacentBlanks = new List<Tile>();
+            List<Tile> adjacentTiles = GetAdjacentTiles(Tile);
+
+            foreach (var tile in adjacentTiles)
+            {
+                if (!tile.IsMine && !tile.IsRevealed && !tile.IsFlagged
+                    && tile.CountAdjacentMines(this) == 0)
+                {
+                    adjacentBlanks.Add(tile);
+                }
+            }
+
+            return adjacentBlanks;
+        }
+
+        // reveal all blanks in chain as well as numbers on edge
+        private void RevealAllConnectedBlanks(Tile Tile)
+        {
+            List<Tile> connectedBlanks = new List<Tile>()
+            {
+                Tile
+            };
+            List<Tile> lastConnectedBlanks = GetAdjacentBlanks(Tile);
+
+            while (true)
+            {
+                // add all blanks adjacent to last blanks to list
+                List<Tile> newConnectedBlanks = new List<Tile>();
+                foreach (var tile in lastConnectedBlanks)
+                {
+                    newConnectedBlanks.AddRange(GetAdjacentBlanks(tile));
+                }
+                // reveal last blanks
+                foreach (var tile in lastConnectedBlanks)
+                {
+                    tile.IsRevealed = true;
+                }
+                // add lastConnectedBlanks to connectedBlanks
+                connectedBlanks.AddRange(lastConnectedBlanks);
+
+                // set lastConnectedBlanks to newConnectedBlanks without duplicates
+                if (newConnectedBlanks.Count > 0)
+                {
+                    lastConnectedBlanks = newConnectedBlanks.Distinct().ToList();
+                }
+                else
+                {
+                    break;
+                }
+            }
+            // remove duplicates from connectedBlanks
+            connectedBlanks = connectedBlanks.Distinct().ToList();
+            foreach (var blank in connectedBlanks)
+            {
+                List<Tile> nonBlanks = GetAdjacentTiles(blank).FindAll(
+                    t => t.AdjacentMines > 0 && !t.IsRevealed);
+                foreach (var tile in nonBlanks)
+                {
+                    tile.IsRevealed = true;
                 }
             }
         }

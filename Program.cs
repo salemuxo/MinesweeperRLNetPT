@@ -32,7 +32,7 @@ namespace MinesweeperRLNetPT
             string fontFileName = "terminal8x8.png";
             string consoleTitle = "Minesweeper";
             _rootConsole = new RLRootConsole(fontFileName,
-                _screenWidth, _screenHeight, 8, 8, 2f, consoleTitle);
+                _screenWidth, _screenHeight, 8, 8, 4f, consoleTitle);
 
             // create map console
             _mapConsole = new RLConsole(_mapWidth, _mapHeight);

@@ -1,5 +1,6 @@
 ﻿using RLNET;
 using SalemLib;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -39,7 +40,11 @@ namespace MinesweeperRLNetPT.Core
 
         public void Draw(RLConsole console)
         {
-            if (!IsRevealed)
+            if (IsFlagged)
+            {
+                SetConsoleSymbol(console, Colors.Flag, 'F');
+            }
+            else if (!IsRevealed)
             {
                 SetConsoleSymbol(console, Colors.Undiscovered, 'X');
             }
@@ -47,19 +52,54 @@ namespace MinesweeperRLNetPT.Core
             {
                 SetConsoleSymbol(console, Colors.Mine, 'M');
             }
-            else if (IsFlagged)
+            else if (AdjacentMines != 0)
             {
-                SetConsoleSymbol(console, Colors.Flag, 'F');
+                SetConsoleSymbolFromAdjMines(console);
             }
             else
             {
-                SetConsoleSymbol(console, RLColor.Red, (char)AdjacentMines);
+                SetConsoleSymbol(console, Colors.Background, 0);
             }
         }
 
         public void SetConsoleSymbol(RLConsole console, RLColor color, int symbol)
         {
             console.Set(Position.X, Position.Y, color, Colors.Background, symbol);
+        }
+
+        public void SetConsoleSymbolFromAdjMines(RLConsole console)
+        {
+            int charIndex = AdjacentMines + 48;
+            SetConsoleSymbol(console, Colors.Number, charIndex);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null || !this.GetType().Equals(obj.GetType()))
+            {
+                return false;
+            }
+            else
+            {
+                Tile t = (Tile)obj;
+                return t.Position.Equals(Position)
+                    && t.IsMine == IsMine
+                    && t.IsRevealed == IsRevealed
+                    && t.IsFlagged == IsFlagged
+                    && t.AdjacentMines == AdjacentMines;
+            }
+        }
+
+        // generated GetHashCode override
+        public override int GetHashCode()
+        {
+            int hashCode = -1020351265;
+            hashCode = hashCode * -1521134295 + Position.GetHashCode();
+            hashCode = hashCode * -1521134295 + IsMine.GetHashCode();
+            hashCode = hashCode * -1521134295 + IsRevealed.GetHashCode();
+            hashCode = hashCode * -1521134295 + IsFlagged.GetHashCode();
+            hashCode = hashCode * -1521134295 + AdjacentMines.GetHashCode();
+            return hashCode;
         }
     }
 }
