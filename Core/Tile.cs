@@ -1,8 +1,5 @@
 ﻿using RLNET;
 using SalemLib;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 
 namespace MinesweeperRLNetPT.Core
 {
@@ -13,7 +10,7 @@ namespace MinesweeperRLNetPT.Core
         public bool IsRevealed { get; set; }
         public bool IsFlagged { get; set; }
         public int AdjacentMines { get; set; }
-        
+
         public Tile(Point position)
         {
             Position = position;

@@ -30,13 +30,25 @@ namespace MinesweeperRLNetPT.Core
         private void HandleMouseInput()
         {
             RLMouse mouse = _rootConsole.Mouse;
-            if (mouse.GetLeftClick())
+
+            // mouse on map and game active
+            if (mouse.X >= Game.MapPosition.X &&
+                mouse.X <= Game.MapPosition.X + Game.MapPosition.W &&
+                mouse.Y >= Game.MapPosition.Y &&
+                mouse.Y <= Game.MapPosition.Y + Game.MapPosition.H &&
+                Game.IsPlaying)
             {
-                Program.Map.TileLClicked(mouse.X, mouse.Y);
-            }
-            if (mouse.GetRightClick())
-            {
-                Program.Map.TileRClicked(mouse.X, mouse.Y);
+                int clickedTileX = mouse.X - Game.MapPosition.X;
+                int clickedTileY = mouse.Y - Game.MapPosition.Y;
+
+                if (mouse.GetLeftClick())
+                {
+                    Game.Map.LClicked(clickedTileX, clickedTileY);
+                }
+                if (mouse.GetRightClick())
+                {
+                    Game.Map.RClicked(clickedTileX, clickedTileY);
+                }
             }
         }
     }

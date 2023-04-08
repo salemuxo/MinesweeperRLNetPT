@@ -1,4 +1,4 @@
-﻿using OpenTK.Graphics.OpenGL;
+﻿using MinesweeperRLNetPT.Core;
 using RLNET;
 using SalemLib;
 using System;
@@ -15,12 +15,15 @@ namespace MinesweeperRLNetPT.Core
         public int Mines { get; set; } // number of mines on map
         public List<List<Tile>> Tiles { get; set; }
 
+        private bool AreMinesGenerated;
+
         public Map(int w, int h, int mines)
         {
-            Width = w; 
+            Width = w;
             Height = h;
             Mines = mines;
-            InitMap();
+            CreateTiles();
+            AreMinesGenerated = false;
         }
 
         // PUBLIC METHODS
@@ -38,33 +41,38 @@ namespace MinesweeperRLNetPT.Core
         }
 
         // left clicked Tile -> reveal tile
-        public void TileLClicked(int x, int y)
+        public void LClicked(int x, int y)
         {
-            var clickedTile = Tiles[x][y];
-            if (!clickedTile.IsRevealed)
+            if (AreMinesGenerated)
             {
-                clickedTile.IsRevealed = true;
-                if (clickedTile.IsMine)
+                var clickedTile = Tiles[x][y];
+                if (!clickedTile.IsRevealed)
                 {
-                    Debug.WriteLine("Game Over!");
-                }
-                else
-                {
-                    int adjacentMines = clickedTile.CountAdjacentMines(this);
-                    if (adjacentMines == 0)
+                    clickedTile.IsRevealed = true;
+                    if (clickedTile.IsMine)
                     {
-                        RevealAllConnectedBlanks(clickedTile);
+                        Game.EndGame();
                     }
                     else
                     {
-
+                        int adjacentMines = clickedTile.CountAdjacentMines(this);
+                        if (adjacentMines == 0)
+                        {
+                            RevealAllConnectedBlanks(clickedTile);
+                        }
                     }
                 }
+            }
+            else
+            {
+                AreMinesGenerated = true;
+                CreateMines(new Point(x, y));
+                LClicked(x, y);
             }
         }
 
         // right clicked Tile -> toggle flag
-        public void TileRClicked(int x, int y)
+        public void RClicked(int x, int y)
         {
             var clickedTile = Tiles[x][y];
             if (!clickedTile.IsRevealed)
@@ -96,7 +104,7 @@ namespace MinesweeperRLNetPT.Core
                     {
                         int newX = tile.Position.X + x;
                         int newY = tile.Position.Y + y;
-                        if (newX >= 0 && newX < Width 
+                        if (newX >= 0 && newX < Width
                             && newY >= 0 && newY < Height)
                         {
                             adjacentTiles.Add(
@@ -109,13 +117,6 @@ namespace MinesweeperRLNetPT.Core
         }
 
         // PRIVATE METHODS
-
-        // create Tiles and Mines
-        private void InitMap()
-        {
-            CreateTiles();
-            CreateMines();
-        }
 
         // create Tiles based on Width and Height
         private void CreateTiles()
@@ -132,18 +133,20 @@ namespace MinesweeperRLNetPT.Core
         }
 
         // create # of mines based on Mines at random positions
-        private void CreateMines()
+        private void CreateMines(Point invalidPosition)
         {
             for (int m = 0; m < Mines; m++)
             {
-                var x = Program.Random.Next(Width);
-                var y = Program.Random.Next(Height);
-                
-                // if tile is not a mine, make it one, otherwise don't increase loop number
-                if (!Tiles[x][y].IsMine)
+                var x = Game.Random.Next(Width);
+                var y = Game.Random.Next(Height);
+
+                // if tile is not a mine and is not the invalid position, make mine
+                if (!Tiles[x][y].IsMine &&
+                    !Tiles[x][y].Position.Equals(invalidPosition))
                 {
                     Tiles[x][y].IsMine = true;
                 }
+                // otherwise decrease loop number
                 else
                 {
                     m--;

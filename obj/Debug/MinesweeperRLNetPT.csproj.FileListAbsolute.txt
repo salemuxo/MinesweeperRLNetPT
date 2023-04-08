@@ -12,3 +12,17 @@ C:\Users\s.stockdale1\CS30\RLNet\MinesweeperRLNetPT\obj\Debug\MinesweeperRLNetPT
 C:\Users\s.stockdale1\CS30\RLNet\MinesweeperRLNetPT\obj\Debug\MinesweeperRLNetPT.exe
 C:\Users\s.stockdale1\CS30\RLNet\MinesweeperRLNetPT\obj\Debug\MinesweeperRLNetPT.pdb
 C:\Users\s.stockdale1\CS30\RLNet\MinesweeperRLNetPT\bin\Debug\terminal8x8.png
+C:\Coding\C#\MinesweeperRLNetPT\bin\Debug\terminal8x8.png
+C:\Coding\C#\MinesweeperRLNetPT\bin\Debug\MinesweeperRLNetPT.exe.config
+C:\Coding\C#\MinesweeperRLNetPT\bin\Debug\MinesweeperRLNetPT.exe
+C:\Coding\C#\MinesweeperRLNetPT\bin\Debug\MinesweeperRLNetPT.pdb
+C:\Coding\C#\MinesweeperRLNetPT\bin\Debug\OpenTK.dll
+C:\Coding\C#\MinesweeperRLNetPT\bin\Debug\RLNET.dll
+C:\Coding\C#\MinesweeperRLNetPT\bin\Debug\OpenTK.xml
+C:\Coding\C#\MinesweeperRLNetPT\bin\Debug\OpenTK.dll.config
+C:\Coding\C#\MinesweeperRLNetPT\obj\Debug\MinesweeperRLNetPT.csproj.AssemblyReference.cache
+C:\Coding\C#\MinesweeperRLNetPT\obj\Debug\MinesweeperRLNetPT.csproj.SuggestedBindingRedirects.cache
+C:\Coding\C#\MinesweeperRLNetPT\obj\Debug\MinesweeperRLNetPT.csproj.CoreCompileInputs.cache
+C:\Coding\C#\MinesweeperRLNetPT\obj\Debug\MinesweeperRLNetPT.csproj.CopyComplete
+C:\Coding\C#\MinesweeperRLNetPT\obj\Debug\MinesweeperRLNetPT.exe
+C:\Coding\C#\MinesweeperRLNetPT\obj\Debug\MinesweeperRLNetPT.pdb

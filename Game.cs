@@ -1,36 +1,45 @@
 ﻿using MinesweeperRLNetPT.Core;
 using RLNET;
+using SalemLib;
 using System;
+using System.Diagnostics;
 
 namespace MinesweeperRLNetPT
 {
-    public static class Program
+    public static class Game
     {
         // height and width in tiles
-
         // root console
-        private static readonly int _screenWidth = 8;
-        private static readonly int _screenHeight = 8;
+        private const int _screenWidth = 10;
+        private const int _screenHeight = 14;
         private static RLRootConsole _rootConsole;
 
         // map console
-        private static readonly int _mapWidth = 8;
-        private static readonly int _mapHeight = 8;
-        private static readonly int _mines = 9;
+        private const int _mapWidth = 8;
+        private const int _mapHeight = 8;
+        private const int _mapCenteredX = (_screenWidth - _mapWidth) / 2;
+        private const int _mapCenteredY = (_screenHeight - _mapHeight) / 2;
+        private const int _mapX = _mapCenteredX;
+        private const int _mapY = 1;
+        private const int _mines = 9;
         private static RLConsole _mapConsole;
+
+        public static bool IsPlaying = true;
 
         public static Random Random { get; private set; }
         public static Map Map { get; private set; }
         public static InputHandler InputHandler { get; private set; }
+        public static Rectangle MapPosition { get; private set; }
 
         public static void Main()
         {
             Random = new Random();
             Map = new Map(_mapHeight, _mapWidth, _mines);
+            MapPosition = new Rectangle(_mapX, _mapY, _mapWidth, _mapHeight);
 
             // create root console
-            string fontFileName = "terminal8x8.png";
-            string consoleTitle = "Minesweeper";
+            const string fontFileName = "terminal8x8.png";
+            const string consoleTitle = "Minesweeper";
             _rootConsole = new RLRootConsole(fontFileName,
                 _screenWidth, _screenHeight, 8, 8, 4f, consoleTitle);
 
@@ -55,14 +64,16 @@ namespace MinesweeperRLNetPT
         private static void OnRootConsoleRender(object sender, UpdateEventArgs e)
         {
             Map.Draw(_mapConsole);
-
-            // get centered position in root console for map and blit to root console
-            int mapCenteredX = (_screenWidth - _mapWidth) / 2;
-            int mapCenteredY = (_screenHeight - _mapHeight) / 2;
-            RLConsole.Blit(_mapConsole, 0, 0, _mapWidth, 
-                _mapHeight, _rootConsole, mapCenteredX, mapCenteredY);
+            RLConsole.Blit(_mapConsole, 0, 0, _mapWidth,
+                _mapHeight, _rootConsole, _mapX, _mapY);
 
             _rootConsole.Draw();
+        }
+
+        public static void EndGame()
+        {
+            IsPlaying = false;
+            Debug.WriteLine("Game Over!");
         }
     }
 }
