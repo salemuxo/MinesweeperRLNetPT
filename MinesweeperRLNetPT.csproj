@@ -50,9 +50,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\Colors.cs" />
+    <Compile Include="Core\ExtensionMethods.cs" />
     <Compile Include="Core\InputHandler.cs" />
     <Compile Include="Core\Map.cs" />
     <Compile Include="Core\Palette.cs" />
+    <Compile Include="Core\Stats.cs" />
     <Compile Include="Core\Tile.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -67,8 +69,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Screens\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

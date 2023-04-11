@@ -33,21 +33,22 @@ namespace MinesweeperRLNetPT.Core
 
             // mouse on map and game active
             if (mouse.X >= Game.MapPosition.X &&
-                mouse.X <= Game.MapPosition.X + Game.MapPosition.W &&
+                mouse.X < Game.MapPosition.X + Game.MapPosition.W &&
                 mouse.Y >= Game.MapPosition.Y &&
-                mouse.Y <= Game.MapPosition.Y + Game.MapPosition.H &&
+                mouse.Y < Game.MapPosition.Y + Game.MapPosition.H &&
                 Game.IsPlaying)
             {
-                int clickedTileX = mouse.X - Game.MapPosition.X;
-                int clickedTileY = mouse.Y - Game.MapPosition.Y;
+                int mouseTileX = mouse.X - Game.MapPosition.X;
+                int mouseTileY = mouse.Y - Game.MapPosition.Y;
 
+                Game.Map.HandleMouseHover(mouseTileX, mouseTileY);
                 if (mouse.GetLeftClick())
                 {
-                    Game.Map.LClicked(clickedTileX, clickedTileY);
+                    Game.Map.LClicked(mouseTileX, mouseTileY);
                 }
                 if (mouse.GetRightClick())
                 {
-                    Game.Map.RClicked(clickedTileX, clickedTileY);
+                    Game.Map.RClicked(mouseTileX, mouseTileY);
                 }
             }
         }

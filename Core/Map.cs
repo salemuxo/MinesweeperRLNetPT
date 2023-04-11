@@ -13,15 +13,18 @@ namespace MinesweeperRLNetPT.Core
         public int Width { get; set; } // width of map in tiles
         public int Height { get; set; } // height of map in tiles
         public int Mines { get; set; } // number of mines on map
+        public int Flags { get; set; } // number of flags
         public List<List<Tile>> Tiles { get; set; }
 
         private bool AreMinesGenerated;
+        private Tile highlightedTile;
 
         public Map(int w, int h, int mines)
         {
             Width = w;
             Height = h;
             Mines = mines;
+            Flags = 0;
             CreateTiles();
             AreMinesGenerated = false;
         }
@@ -48,7 +51,7 @@ namespace MinesweeperRLNetPT.Core
                 var clickedTile = Tiles[x][y];
                 if (!clickedTile.IsRevealed)
                 {
-                    clickedTile.IsRevealed = true;
+                    clickedTile.Reveal();
                     if (clickedTile.IsMine)
                     {
                         Game.EndGame();
@@ -63,7 +66,7 @@ namespace MinesweeperRLNetPT.Core
                     }
                 }
             }
-            else
+            else // generate mines
             {
                 AreMinesGenerated = true;
                 CreateMines(new Point(x, y));
@@ -77,14 +80,20 @@ namespace MinesweeperRLNetPT.Core
             var clickedTile = Tiles[x][y];
             if (!clickedTile.IsRevealed)
             {
-                if (clickedTile.IsFlagged)
-                {
-                    clickedTile.IsFlagged = false;
-                }
-                else
-                {
-                    clickedTile.IsFlagged = true;
-                }
+                clickedTile.ToggleFlag();
+                int flag = (clickedTile.IsFlagged) ? 1 : -1;
+                Flags += flag;
+            }
+        }
+
+        public void HandleMouseHover(int x, int y)
+        {
+            var hoveredTile = Tiles[x][y];
+            if (hoveredTile != highlightedTile)
+            {
+                highlightedTile?.ToggleHighlight();
+                highlightedTile = hoveredTile;
+                highlightedTile.ToggleHighlight();
             }
         }
 
@@ -192,7 +201,7 @@ namespace MinesweeperRLNetPT.Core
                 // reveal last blanks
                 foreach (var tile in lastConnectedBlanks)
                 {
-                    tile.IsRevealed = true;
+                    tile.Reveal();
                 }
                 // add lastConnectedBlanks to connectedBlanks
                 connectedBlanks.AddRange(lastConnectedBlanks);
@@ -215,7 +224,7 @@ namespace MinesweeperRLNetPT.Core
                     t => t.AdjacentMines > 0 && !t.IsRevealed);
                 foreach (var tile in nonBlanks)
                 {
-                    tile.IsRevealed = true;
+                    tile.Reveal();
                 }
             }
         }
