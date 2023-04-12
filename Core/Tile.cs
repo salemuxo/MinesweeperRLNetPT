@@ -28,18 +28,17 @@ namespace MinesweeperRLNetPT.Core
         public int CountAdjacentMines(Map map)
         {
             var adjacentTiles = map.GetAdjacentTiles(this);
-            int mineCount = 0;
-
-            foreach (var tile in adjacentTiles)
-            {
-                if (tile.IsMine)
-                {
-                    mineCount++;
-                }
-            }
+            int mineCount = adjacentTiles.FindAll(x => x.IsMine).Count;
 
             AdjacentMines = mineCount;
             return mineCount;
+        }
+
+        public int CountAdjacentFlags(Map map)
+        {
+            var adjacentTiles = map.GetAdjacentTiles(this);
+            int flagCount = adjacentTiles.FindAll(x => x.IsFlagged).Count;
+            return flagCount;
         }
 
         public void Draw(RLConsole console)
@@ -70,6 +69,19 @@ namespace MinesweeperRLNetPT.Core
         {
             IsRevealed = true;
             UpdateColor();
+
+            if (IsMine)
+            {
+                Game.EndGame();
+            }
+            else
+            {
+                int adjacentMines = CountAdjacentMines(Game.Map);
+                if (adjacentMines == 0)
+                {
+                    Game.Map.RevealAllConnectedBlanks(this);
+                }
+            }
         }
 
         public void ToggleFlag()

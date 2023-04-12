@@ -52,18 +52,7 @@ namespace MinesweeperRLNetPT.Core
                 if (!clickedTile.IsRevealed)
                 {
                     clickedTile.Reveal();
-                    if (clickedTile.IsMine)
-                    {
-                        Game.EndGame();
-                    }
-                    else
-                    {
-                        int adjacentMines = clickedTile.CountAdjacentMines(this);
-                        if (adjacentMines == 0)
-                        {
-                            RevealAllConnectedBlanks(clickedTile);
-                        }
-                    }
+                    
                 }
             }
             else // generate mines
@@ -81,8 +70,22 @@ namespace MinesweeperRLNetPT.Core
             if (!clickedTile.IsRevealed)
             {
                 clickedTile.ToggleFlag();
-                int flag = (clickedTile.IsFlagged) ? 1 : -1;
-                Flags += flag;
+                Flags += (clickedTile.IsFlagged) ? 1 : -1;
+            }
+        }
+
+        // middle clicked Tile -> reveal
+        public void MClicked(int x, int y)
+        {
+            var clickedTile = Tiles[x][y];
+            if (clickedTile.CountAdjacentFlags(this) == clickedTile.AdjacentMines 
+                && clickedTile.IsRevealed && !clickedTile.IsMine)
+            {
+                foreach (var tile in GetAdjacentTiles(clickedTile)
+                    .FindAll(n => !n.IsFlagged))
+                {
+                    tile.Reveal();
+                }
             }
         }
 
@@ -123,6 +126,54 @@ namespace MinesweeperRLNetPT.Core
                 }
             }
             return adjacentTiles;
+        }
+
+        // reveal all blanks in chain as well as numbers on edge
+        public void RevealAllConnectedBlanks(Tile Tile)
+        {
+            List<Tile> connectedBlanks = new List<Tile>()
+            {
+                Tile
+            };
+            List<Tile> lastConnectedBlanks = GetAdjacentBlanks(Tile);
+
+            while (true)
+            {
+                // add all blanks adjacent to last blanks to list
+                List<Tile> newConnectedBlanks = new List<Tile>();
+                foreach (var tile in lastConnectedBlanks)
+                {
+                    newConnectedBlanks.AddRange(GetAdjacentBlanks(tile));
+                }
+                // reveal last blanks
+                foreach (var tile in lastConnectedBlanks)
+                {
+                    tile.Reveal();
+                }
+                // add lastConnectedBlanks to connectedBlanks
+                connectedBlanks.AddRange(lastConnectedBlanks);
+
+                // set lastConnectedBlanks to newConnectedBlanks without duplicates
+                if (newConnectedBlanks.Count > 0)
+                {
+                    lastConnectedBlanks = newConnectedBlanks.Distinct().ToList();
+                }
+                else
+                {
+                    break;
+                }
+            }
+            // remove duplicates from connectedBlanks
+            connectedBlanks = connectedBlanks.Distinct().ToList();
+            foreach (var blank in connectedBlanks)
+            {
+                List<Tile> nonBlanks = GetAdjacentTiles(blank).FindAll(
+                    t => t.AdjacentMines > 0 && !t.IsRevealed && !t.IsFlagged);
+                foreach (var tile in nonBlanks)
+                {
+                    tile.Reveal();
+                }
+            }
         }
 
         // PRIVATE METHODS
@@ -181,52 +232,6 @@ namespace MinesweeperRLNetPT.Core
             return adjacentBlanks;
         }
 
-        // reveal all blanks in chain as well as numbers on edge
-        private void RevealAllConnectedBlanks(Tile Tile)
-        {
-            List<Tile> connectedBlanks = new List<Tile>()
-            {
-                Tile
-            };
-            List<Tile> lastConnectedBlanks = GetAdjacentBlanks(Tile);
-
-            while (true)
-            {
-                // add all blanks adjacent to last blanks to list
-                List<Tile> newConnectedBlanks = new List<Tile>();
-                foreach (var tile in lastConnectedBlanks)
-                {
-                    newConnectedBlanks.AddRange(GetAdjacentBlanks(tile));
-                }
-                // reveal last blanks
-                foreach (var tile in lastConnectedBlanks)
-                {
-                    tile.Reveal();
-                }
-                // add lastConnectedBlanks to connectedBlanks
-                connectedBlanks.AddRange(lastConnectedBlanks);
-
-                // set lastConnectedBlanks to newConnectedBlanks without duplicates
-                if (newConnectedBlanks.Count > 0)
-                {
-                    lastConnectedBlanks = newConnectedBlanks.Distinct().ToList();
-                }
-                else
-                {
-                    break;
-                }
-            }
-            // remove duplicates from connectedBlanks
-            connectedBlanks = connectedBlanks.Distinct().ToList();
-            foreach (var blank in connectedBlanks)
-            {
-                List<Tile> nonBlanks = GetAdjacentTiles(blank).FindAll(
-                    t => t.AdjacentMines > 0 && !t.IsRevealed);
-                foreach (var tile in nonBlanks)
-                {
-                    tile.Reveal();
-                }
-            }
-        }
+        
     }
 }

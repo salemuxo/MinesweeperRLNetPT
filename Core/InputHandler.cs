@@ -50,6 +50,10 @@ namespace MinesweeperRLNetPT.Core
                 {
                     Game.Map.RClicked(mouseTileX, mouseTileY);
                 }
+                if (mouse.GetMiddleClick())
+                {
+                    Game.Map.MClicked(mouseTileX, mouseTileY);
+                }
             }
         }
     }

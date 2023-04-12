@@ -26,3 +26,4 @@ C:\Coding\C#\MinesweeperRLNetPT\obj\Debug\MinesweeperRLNetPT.csproj.CoreCompileI
 C:\Coding\C#\MinesweeperRLNetPT\obj\Debug\MinesweeperRLNetPT.csproj.CopyComplete
 C:\Coding\C#\MinesweeperRLNetPT\obj\Debug\MinesweeperRLNetPT.exe
 C:\Coding\C#\MinesweeperRLNetPT\obj\Debug\MinesweeperRLNetPT.pdb
+C:\Users\s.stockdale1\CS30\RLNet\MinesweeperRLNetPT\bin\Debug\RLNET.pdb
