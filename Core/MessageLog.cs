@@ -8,18 +8,30 @@ namespace MinesweeperRLNetPT.Core
     {
         private readonly int _width;
         private readonly int _height;
-        private readonly Queue<string> _lines;
+        private readonly Queue<Message> _lines;
 
         public MessageLog(int width, int height)
         {
             _width = width;
             _height = height;
-            _lines = new Queue<string>();
+            _lines = new Queue<Message>();
         }
 
         public void Add(string line)
         {
-            _lines.Enqueue(line);
+            Message newMessage = new Message(line, GetCenteredPos(line), RLColor.White);
+            _lines.Enqueue(newMessage);
+
+            if (_lines.Count > _height)
+            {
+                _lines.Dequeue();
+            }
+        }
+
+        public void Add(string line, RLColor color)
+        {
+            Message newMessage = new Message(line, GetCenteredPos(line), color);
+            _lines.Enqueue(newMessage);
 
             if (_lines.Count > _height)
             {
@@ -30,11 +42,17 @@ namespace MinesweeperRLNetPT.Core
         public void Draw(RLConsole logConsole)
         {
             logConsole.Clear();
-            string[] lines = _lines.ToArray();
+            Message[] lines = _lines.ToArray();
             for (int i = 0; i < lines.Length; i++)
             {
-                logConsole.Print(0, i, lines[i], RLColor.White);
+                Message message = lines[i];
+                logConsole.Print(0, i, message.Line, message.Color);
             }
+        }
+
+        private int GetCenteredPos(string str)
+        {
+            return (_width - str.Length) / 2;
         }
     }
 }

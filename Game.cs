@@ -3,6 +3,7 @@ using RLNET;
 using SalemLib;
 using System;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 
 namespace MinesweeperRLNetPT
 {
@@ -10,35 +11,41 @@ namespace MinesweeperRLNetPT
     {
         // height and width in tiles
         // root console
-        private const int _screenWidth = 10;
-        private const int _screenHeight = 14;
+
+        private const string fontFileName = "terminal8x8.png";
+        private const string consoleTitle = "Minesweeper";
+        private const int _screenWidth = 20;
+        private const int _screenHeight = 22;
         private static RLRootConsole _rootConsole;
 
         // map console
+
         private const int _mapWidth = 8;
         private const int _mapHeight = 8;
-        private const int _mapCenteredX = (_screenWidth - _mapWidth) / 2;
-        private const int _mapX = _mapCenteredX;
-        private const int _mapY = 1;
+        private const int _mapX = (_screenWidth - _mapWidth) / 2;
+        private const int _mapY = 2;
         private const int _mines = 9;
         private static RLConsole _mapConsole;
 
         // stat console
+
         private const int _statWidth = _mapWidth;
         private const int _statHeight = 1;
         private const int _statX = _mapX;
-        private const int _statY = 0;
+        private const int _statY = 1;
         private static RLConsole _statConsole;
 
         // log console
-        private const int _logWidth = 10;
-        private const int _logHeight = 5;
-        private const int _logX = 0;
-        private const int _logY = 9;
+
+        private const int _logWidth = 18;
+        private const int _logHeight = 10;
+        private const int _logX = 1;
+        private const int _logY = 11;
         private static RLConsole _logConsole;
 
-        public static bool IsPlaying = true;
+        private static bool IsRootConsoleCreated = false;
 
+        public static bool IsPlaying { get; set; } = true;
         public static Random Random { get; private set; }
         public static Map Map { get; private set; }
         public static StatDisplay StatDisplay { get; private set; }
@@ -56,10 +63,12 @@ namespace MinesweeperRLNetPT
             MapPosition = new Rectangle(_mapX, _mapY, _mapWidth, _mapHeight);
 
             // create root console
-            const string fontFileName = "terminal8x8.png";
-            const string consoleTitle = "Minesweeper";
-            _rootConsole = new RLRootConsole(fontFileName,
-                _screenWidth, _screenHeight, 8, 8, 4f, consoleTitle);
+            if (!IsRootConsoleCreated)
+            {
+                _rootConsole = new RLRootConsole(fontFileName,
+                    _screenWidth, _screenHeight, 8, 8, 4f, consoleTitle);
+                IsRootConsoleCreated = true;
+            }
 
             // create subconsoles
             _mapConsole = new RLConsole(_mapWidth, _mapHeight);
@@ -88,11 +97,12 @@ namespace MinesweeperRLNetPT
             StatDisplay.Draw(_statConsole);
             MessageLog.Draw(_logConsole);
 
+            // blit subconsoles to root console
             RLConsole.Blit(_mapConsole, 0, 0, _mapWidth,
                 _mapHeight, _rootConsole, _mapX, _mapY);
             RLConsole.Blit(_statConsole, 0, 0, _statWidth,
                 _statHeight, _rootConsole, _statX, _statY);
-            RLConsole.Blit(_logConsole, 0, 0, _logWidth, 
+            RLConsole.Blit(_logConsole, 0, 0, _logWidth,
                 _logHeight, _rootConsole, _logX, _logY);
 
             _rootConsole.Draw();
@@ -100,8 +110,15 @@ namespace MinesweeperRLNetPT
 
         public static void EndGame()
         {
-            //IsPlaying = false;
-            MessageLog.Add("Game Over!");
+            IsPlaying = false;
+            MessageLog.Add("Game Over!", RLColor.Red);
+            Map.RevealAll(Map.GetAllMines());
+        }
+
+        public static void RestartGame()
+        {
+            IsPlaying = true;
+            Main();
         }
     }
 }

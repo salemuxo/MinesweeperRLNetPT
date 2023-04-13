@@ -1,5 +1,7 @@
 ﻿using RLNET;
+using System;
 using System.Diagnostics;
+using System.Runtime.Hosting;
 
 namespace MinesweeperRLNetPT.Core
 {
@@ -23,7 +25,16 @@ namespace MinesweeperRLNetPT.Core
             RLKeyPress keyPress = _rootConsole.Keyboard.GetKeyPress();
             if (keyPress != null)
             {
-                Debug.WriteLine($"{keyPress.Key} pressed");
+                Game.MessageLog.Add($"{keyPress.Key} pressed");
+                if (keyPress.Key == RLKey.Escape &&
+                    Game.Map.AreMinesGenerated)
+                {
+                    Game.EndGame();
+                }
+                else if (keyPress.Key == RLKey.R)
+                {
+                    Game.RestartGame();
+                }
             }
         }
 
@@ -35,8 +46,7 @@ namespace MinesweeperRLNetPT.Core
             if (mouse.X >= Game.MapPosition.X &&
                 mouse.X < Game.MapPosition.X + Game.MapPosition.W &&
                 mouse.Y >= Game.MapPosition.Y &&
-                mouse.Y < Game.MapPosition.Y + Game.MapPosition.H &&
-                Game.IsPlaying)
+                mouse.Y < Game.MapPosition.Y + Game.MapPosition.H)
             {
                 int mouseTileX = mouse.X - Game.MapPosition.X;
                 int mouseTileY = mouse.Y - Game.MapPosition.Y;
@@ -45,14 +55,20 @@ namespace MinesweeperRLNetPT.Core
                 if (mouse.GetLeftClick())
                 {
                     Game.Map.LClicked(mouseTileX, mouseTileY);
+                    Game.MessageLog.Add(
+                        $"LC at ({mouseTileX},{mouseTileY})");
                 }
                 if (mouse.GetRightClick())
                 {
                     Game.Map.RClicked(mouseTileX, mouseTileY);
+                    Game.MessageLog.Add(
+                        $"RC at ({mouseTileX},{mouseTileY})");
                 }
                 if (mouse.GetMiddleClick())
                 {
                     Game.Map.MClicked(mouseTileX, mouseTileY);
+                    Game.MessageLog.Add(
+                        $"MC at ({mouseTileX},{mouseTileY})");
                 }
             }
         }

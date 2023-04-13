@@ -25,6 +25,7 @@ namespace MinesweeperRLNetPT.Core
             UpdateBgColor();
         }
 
+        // PUBLIC METHODS
         public int CountAdjacentMines(Map map)
         {
             var adjacentTiles = map.GetAdjacentTiles(this);
@@ -38,30 +39,45 @@ namespace MinesweeperRLNetPT.Core
         {
             var adjacentTiles = map.GetAdjacentTiles(this);
             int flagCount = adjacentTiles.FindAll(x => x.IsFlagged).Count;
+
             return flagCount;
         }
 
         public void Draw(RLConsole console)
         {
-            if (IsFlagged)
+            if (Game.IsPlaying)
             {
-                SetConsoleSymbol(console, 'F');
-            }
-            else if (!IsRevealed)
-            {
-                SetConsoleSymbol(console, 'X');
-            }
-            else if (IsMine)
-            {
-                SetConsoleSymbol(console, 'M');
-            }
-            else if (AdjacentMines != 0)
-            {
-                SetConsoleSymbolFromAdjMines(console);
+                if (IsFlagged)
+                {
+                    SetConsoleSymbol(console, 'F');
+                }
+                else if (!IsRevealed)
+                {
+                    SetConsoleSymbol(console, 'X');
+                }
+                else if (IsMine)
+                {
+                    SetConsoleSymbol(console, 'M');
+                }
+                else if (AdjacentMines != 0)
+                {
+                    SetConsoleSymbolFromAdjMines(console);
+                }
+                else
+                {
+                    SetConsoleSymbol(console, 0);
+                }
             }
             else
             {
-                SetConsoleSymbol(console, 0);
+                if (IsMine)
+                {
+                    SetConsoleSymbol(console, 'M');
+                }
+                else if (IsFlagged)
+                {
+                    SetConsoleSymbol(console, 'F');
+                }
             }
         }
 
@@ -72,7 +88,10 @@ namespace MinesweeperRLNetPT.Core
 
             if (IsMine)
             {
-                Game.EndGame();
+                if (Game.IsPlaying)
+                {
+                    Game.EndGame();
+                }
             }
             else
             {

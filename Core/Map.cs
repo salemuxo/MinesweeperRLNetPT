@@ -15,8 +15,8 @@ namespace MinesweeperRLNetPT.Core
         public int Mines { get; set; } // number of mines on map
         public int Flags { get; set; } // number of flags
         public List<List<Tile>> Tiles { get; set; }
+        public bool AreMinesGenerated { get; set; }
 
-        private bool AreMinesGenerated;
         private Tile highlightedTile;
 
         public Map(int w, int h, int mines)
@@ -43,7 +43,7 @@ namespace MinesweeperRLNetPT.Core
             }
         }
 
-        // left clicked Tile -> reveal tile
+        // left clicked Tile -> reveal Tile
         public void LClicked(int x, int y)
         {
             if (AreMinesGenerated)
@@ -52,7 +52,6 @@ namespace MinesweeperRLNetPT.Core
                 if (!clickedTile.IsRevealed)
                 {
                     clickedTile.Reveal();
-                    
                 }
             }
             else // generate mines
@@ -74,21 +73,19 @@ namespace MinesweeperRLNetPT.Core
             }
         }
 
-        // middle clicked Tile -> reveal
+        // middle clicked Tile -> reveal adjacent Tiles
         public void MClicked(int x, int y)
         {
             var clickedTile = Tiles[x][y];
-            if (clickedTile.CountAdjacentFlags(this) == clickedTile.AdjacentMines 
+            if (clickedTile.CountAdjacentFlags(this) == clickedTile.AdjacentMines
                 && clickedTile.IsRevealed && !clickedTile.IsMine)
             {
-                foreach (var tile in GetAdjacentTiles(clickedTile)
-                    .FindAll(n => !n.IsFlagged))
-                {
-                    tile.Reveal();
-                }
+                RevealAll(GetAdjacentTiles(clickedTile)
+                    .FindAll(n => !n.IsFlagged));
             }
         }
 
+        // highlight tile that mouse is over
         public void HandleMouseHover(int x, int y)
         {
             var hoveredTile = Tiles[x][y];
@@ -146,10 +143,8 @@ namespace MinesweeperRLNetPT.Core
                     newConnectedBlanks.AddRange(GetAdjacentBlanks(tile));
                 }
                 // reveal last blanks
-                foreach (var tile in lastConnectedBlanks)
-                {
-                    tile.Reveal();
-                }
+                RevealAll(lastConnectedBlanks);
+
                 // add lastConnectedBlanks to connectedBlanks
                 connectedBlanks.AddRange(lastConnectedBlanks);
 
@@ -169,10 +164,27 @@ namespace MinesweeperRLNetPT.Core
             {
                 List<Tile> nonBlanks = GetAdjacentTiles(blank).FindAll(
                     t => t.AdjacentMines > 0 && !t.IsRevealed && !t.IsFlagged);
-                foreach (var tile in nonBlanks)
-                {
-                    tile.Reveal();
-                }
+                RevealAll(nonBlanks);
+            }
+        }
+
+        // return list of all tiles with mines
+        public List<Tile> GetAllMines()
+        {
+            var mines = new List<Tile>();
+            foreach (var list in Tiles)
+            {
+                mines.AddRange(list.FindAll(t => t.IsMine));
+            }
+            return mines;
+        }
+
+        // reveal all tiles in list
+        public void RevealAll(List<Tile> tiles)
+        {
+            foreach (var tile in tiles)
+            {
+                tile.Reveal();
             }
         }
 
@@ -231,7 +243,5 @@ namespace MinesweeperRLNetPT.Core
 
             return adjacentBlanks;
         }
-
-        
     }
 }
