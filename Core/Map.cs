@@ -14,17 +14,23 @@ namespace MinesweeperRLNetPT.Core
         public int Height { get; set; } // height of map in tiles
         public int Mines { get; set; } // number of mines on map
         public int Flags { get; set; } // number of flags
+        public int RevealedTiles { get; set; }
+        public int SafeTiles { get; private set; }
         public List<List<Tile>> Tiles { get; set; }
         public bool AreMinesGenerated { get; set; }
 
-        private Tile highlightedTile;
+        private Tile _highlightedTile;
 
         public Map(int w, int h, int mines)
         {
             Width = w;
             Height = h;
             Mines = mines;
+
             Flags = 0;
+            RevealedTiles = 0;
+            SafeTiles = Width * Height - Mines;
+
             CreateTiles();
             AreMinesGenerated = false;
         }
@@ -56,9 +62,7 @@ namespace MinesweeperRLNetPT.Core
             }
             else // generate mines
             {
-                AreMinesGenerated = true;
-                CreateMines(new Point(x, y));
-                LClicked(x, y);
+                InitializeMap(x, y);
             }
         }
 
@@ -77,7 +81,7 @@ namespace MinesweeperRLNetPT.Core
         public void MClicked(int x, int y)
         {
             var clickedTile = Tiles[x][y];
-            if (clickedTile.CountAdjacentFlags(this) == clickedTile.AdjacentMines
+            if (clickedTile.CountAdjacentFlags() == clickedTile.AdjacentMines
                 && clickedTile.IsRevealed && !clickedTile.IsMine)
             {
                 RevealAll(GetAdjacentTiles(clickedTile)
@@ -89,11 +93,11 @@ namespace MinesweeperRLNetPT.Core
         public void HandleMouseHover(int x, int y)
         {
             var hoveredTile = Tiles[x][y];
-            if (hoveredTile != highlightedTile)
+            if (hoveredTile != _highlightedTile)
             {
-                highlightedTile?.ToggleHighlight();
-                highlightedTile = hoveredTile;
-                highlightedTile.ToggleHighlight();
+                _highlightedTile?.ToggleHighlight();
+                _highlightedTile = hoveredTile;
+                _highlightedTile.ToggleHighlight();
             }
         }
 
@@ -111,8 +115,8 @@ namespace MinesweeperRLNetPT.Core
                     }
                     else
                     {
-                        int newX = tile.Position.X + x;
-                        int newY = tile.Position.Y + y;
+                        int newX = tile.X + x;
+                        int newY = tile.Y + y;
                         if (newX >= 0 && newX < Width
                             && newY >= 0 && newY < Height)
                         {
@@ -190,6 +194,13 @@ namespace MinesweeperRLNetPT.Core
 
         // PRIVATE METHODS
 
+        private void InitializeMap(int x, int y)
+        {
+            AreMinesGenerated = true;
+            CreateMines(x, y);
+            LClicked(x, y);
+        }
+
         // create Tiles based on Width and Height
         private void CreateTiles()
         {
@@ -199,13 +210,13 @@ namespace MinesweeperRLNetPT.Core
                 Tiles.Add(new List<Tile>());
                 for (int y = 0; y < Height; y++)
                 {
-                    Tiles[x].Add(new Tile(new Point(x, y)));
+                    Tiles[x].Add(new Tile(x, y));
                 }
             }
         }
 
         // create # of mines based on Mines at random positions
-        private void CreateMines(Point invalidPosition)
+        private void CreateMines(int invalidX, int invalidY)
         {
             for (int m = 0; m < Mines; m++)
             {
@@ -214,7 +225,7 @@ namespace MinesweeperRLNetPT.Core
 
                 // if tile is not a mine and is not the invalid position, make mine
                 if (!Tiles[x][y].IsMine &&
-                    !Tiles[x][y].Position.Equals(invalidPosition))
+                    x != invalidX && y != invalidY)
                 {
                     Tiles[x][y].IsMine = true;
                 }
@@ -235,7 +246,7 @@ namespace MinesweeperRLNetPT.Core
             foreach (var tile in adjacentTiles)
             {
                 if (!tile.IsMine && !tile.IsRevealed && !tile.IsFlagged
-                    && tile.CountAdjacentMines(this) == 0)
+                    && tile.CountAdjacentMines() == 0)
                 {
                     adjacentBlanks.Add(tile);
                 }

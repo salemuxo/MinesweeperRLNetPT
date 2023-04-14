@@ -25,7 +25,7 @@ namespace MinesweeperRLNetPT.Core
             RLKeyPress keyPress = _rootConsole.Keyboard.GetKeyPress();
             if (keyPress != null)
             {
-                Game.MessageLog.Add($"{keyPress.Key} pressed");
+                //Game.MessageLog.Add($"{keyPress.Key} pressed");
                 if (keyPress.Key == RLKey.Escape &&
                     Game.Map.AreMinesGenerated)
                 {
@@ -34,6 +34,10 @@ namespace MinesweeperRLNetPT.Core
                 else if (keyPress.Key == RLKey.R)
                 {
                     Game.RestartGame();
+                }
+                else if (keyPress.Key == RLKey.Q)
+                {
+                    Game.MessageLog.Add($"{Game.Map.RevealedTiles}/{Game.Map.SafeTiles} Revealed");
                 }
             }
         }
@@ -55,20 +59,20 @@ namespace MinesweeperRLNetPT.Core
                 if (mouse.GetLeftClick())
                 {
                     Game.Map.LClicked(mouseTileX, mouseTileY);
-                    Game.MessageLog.Add(
-                        $"LC at ({mouseTileX},{mouseTileY})");
+                    //Game.MessageLog.Add(
+                    //    $"LC at ({mouseTileX},{mouseTileY})");
                 }
                 if (mouse.GetRightClick())
                 {
                     Game.Map.RClicked(mouseTileX, mouseTileY);
-                    Game.MessageLog.Add(
-                        $"RC at ({mouseTileX},{mouseTileY})");
+                    //Game.MessageLog.Add(
+                    //    $"RC at ({mouseTileX},{mouseTileY})");
                 }
                 if (mouse.GetMiddleClick())
                 {
                     Game.Map.MClicked(mouseTileX, mouseTileY);
-                    Game.MessageLog.Add(
-                        $"MC at ({mouseTileX},{mouseTileY})");
+                    //Game.MessageLog.Add(
+                    //    $"MC at ({mouseTileX},{mouseTileY})");
                 }
             }
         }

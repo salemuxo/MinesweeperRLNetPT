@@ -6,7 +6,8 @@ namespace MinesweeperRLNetPT.Core
 {
     public class Tile
     {
-        public Point Position { get; set; }
+        public int X { get; set; }
+        public int Y { get; set; }
         public bool IsMine { get; set; }
         public bool IsRevealed { get; set; }
         public bool IsFlagged { get; set; }
@@ -16,9 +17,10 @@ namespace MinesweeperRLNetPT.Core
         private RLColor Color;
         private RLColor BgColor;
 
-        public Tile(Point position)
+        public Tile(int x, int y)
         {
-            Position = position;
+            X = x;
+            Y = y;
             IsRevealed = false;
             IsMine = false;
             UpdateColor();
@@ -26,18 +28,18 @@ namespace MinesweeperRLNetPT.Core
         }
 
         // PUBLIC METHODS
-        public int CountAdjacentMines(Map map)
+        public int CountAdjacentMines()
         {
-            var adjacentTiles = map.GetAdjacentTiles(this);
+            var adjacentTiles = Game.Map.GetAdjacentTiles(this);
             int mineCount = adjacentTiles.FindAll(x => x.IsMine).Count;
 
             AdjacentMines = mineCount;
             return mineCount;
         }
 
-        public int CountAdjacentFlags(Map map)
+        public int CountAdjacentFlags()
         {
-            var adjacentTiles = map.GetAdjacentTiles(this);
+            var adjacentTiles = Game.Map.GetAdjacentTiles(this);
             int flagCount = adjacentTiles.FindAll(x => x.IsFlagged).Count;
 
             return flagCount;
@@ -83,22 +85,27 @@ namespace MinesweeperRLNetPT.Core
 
         public void Reveal()
         {
-            IsRevealed = true;
-            UpdateColor();
+            if (!IsRevealed)
+            {
+                IsRevealed = true;
+                UpdateColor();
+                Game.Map.RevealedTiles++;
+                //Game.MessageLog.Add($"{Game.Map.RevealedTiles} Revealed");
 
-            if (IsMine)
-            {
-                if (Game.IsPlaying)
+                if (IsMine)
                 {
-                    Game.EndGame();
+                    if (Game.IsPlaying)
+                    {
+                        Game.EndGame();
+                    }
                 }
-            }
-            else
-            {
-                int adjacentMines = CountAdjacentMines(Game.Map);
-                if (adjacentMines == 0)
+                else
                 {
-                    Game.Map.RevealAllConnectedBlanks(this);
+                    int adjacentMines = CountAdjacentMines();
+                    if (adjacentMines == 0)
+                    {
+                        Game.Map.RevealAllConnectedBlanks(this);
+                    }
                 }
             }
         }
@@ -124,7 +131,7 @@ namespace MinesweeperRLNetPT.Core
             else
             {
                 Tile t = (Tile)obj;
-                return t.Position.Equals(Position)
+                return t.X == X && t.Y == Y
                     && t.IsMine == IsMine
                     && t.IsRevealed == IsRevealed
                     && t.IsFlagged == IsFlagged
@@ -135,19 +142,23 @@ namespace MinesweeperRLNetPT.Core
         // generated GetHashCode override
         public override int GetHashCode()
         {
-            int hashCode = -1020351265;
-            hashCode = hashCode * -1521134295 + Position.GetHashCode();
+            int hashCode = -1005644505;
+            hashCode = hashCode * -1521134295 + X.GetHashCode();
+            hashCode = hashCode * -1521134295 + Y.GetHashCode();
             hashCode = hashCode * -1521134295 + IsMine.GetHashCode();
             hashCode = hashCode * -1521134295 + IsRevealed.GetHashCode();
             hashCode = hashCode * -1521134295 + IsFlagged.GetHashCode();
+            hashCode = hashCode * -1521134295 + IsHighlighted.GetHashCode();
             hashCode = hashCode * -1521134295 + AdjacentMines.GetHashCode();
+            hashCode = hashCode * -1521134295 + Color.GetHashCode();
+            hashCode = hashCode * -1521134295 + BgColor.GetHashCode();
             return hashCode;
         }
 
         // PRIVATE METHODS
         private void SetConsoleSymbol(RLConsole console, int symbol)
         {
-            console.Set(Position.X, Position.Y, Color, BgColor, symbol);
+            console.Set(X, Y, Color, BgColor, symbol);
         }
 
         private void SetConsoleSymbolFromAdjMines(RLConsole console)
