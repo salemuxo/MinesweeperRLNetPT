@@ -194,6 +194,7 @@ namespace MinesweeperRLNetPT.Core
 
         // PRIVATE METHODS
 
+        // generate mines
         private void InitializeMap(int x, int y)
         {
             AreMinesGenerated = true;

@@ -51,7 +51,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\Colors.cs" />
-    <Compile Include="Core\ExtensionMethods.cs" />
     <Compile Include="Core\InputHandler.cs" />
     <Compile Include="Core\Message.cs" />
     <Compile Include="Core\MessageLog.cs" />

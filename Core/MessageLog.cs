@@ -17,6 +17,7 @@ namespace MinesweeperRLNetPT.Core
             _lines = new Queue<Message>();
         }
 
+        // add message with default colour
         public void Add(string line)
         {
             Message newMessage = new Message(line, GetCenteredPos(line), RLColor.White);
@@ -28,6 +29,7 @@ namespace MinesweeperRLNetPT.Core
             }
         }
 
+        // add message with specified colour
         public void Add(string line, RLColor color)
         {
             Message newMessage = new Message(line, GetCenteredPos(line), color);
@@ -39,6 +41,7 @@ namespace MinesweeperRLNetPT.Core
             }
         }
 
+        // draw log to logConsole
         public void Draw(RLConsole logConsole)
         {
             logConsole.Clear();
@@ -50,6 +53,7 @@ namespace MinesweeperRLNetPT.Core
             }
         }
 
+        // get centered position in log
         private int GetCenteredPos(string str)
         {
             return (_width - str.Length) / 2;

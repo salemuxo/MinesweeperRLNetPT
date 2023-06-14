@@ -43,8 +43,7 @@ namespace MinesweeperRLNetPT
         private const int _logY = 11;
         private static RLConsole _logConsole;
 
-        private static bool IsRootConsoleCreated = false;
-
+        // systems
         public static bool IsPlaying { get; set; } = true;
         public static Random Random { get; private set; }
         public static Map Map { get; private set; }
@@ -55,6 +54,7 @@ namespace MinesweeperRLNetPT
 
         public static void Main()
         {
+            // initialize systems
             Random = new Random();
             StatDisplay = new StatDisplay();
             MessageLog = new MessageLog(_logWidth, _logHeight);
@@ -63,12 +63,8 @@ namespace MinesweeperRLNetPT
             MapPosition = new Rectangle(_mapX, _mapY, _mapWidth, _mapHeight);
 
             // create root console
-            if (!IsRootConsoleCreated)
-            {
-                _rootConsole = new RLRootConsole(fontFileName,
-                    _screenWidth, _screenHeight, 8, 8, 4f, consoleTitle);
-                IsRootConsoleCreated = true;
-            }
+            _rootConsole = new RLRootConsole(fontFileName,
+                _screenWidth, _screenHeight, 8, 8, 4f, consoleTitle);
 
             // create subconsoles
             _mapConsole = new RLConsole(_mapWidth, _mapHeight);
@@ -117,8 +113,6 @@ namespace MinesweeperRLNetPT
 
         public static void RestartGame()
         {
-            IsPlaying = true;
-            Main();
         }
     }
 }

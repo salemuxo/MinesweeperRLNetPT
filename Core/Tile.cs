@@ -28,6 +28,8 @@ namespace MinesweeperRLNetPT.Core
         }
 
         // PUBLIC METHODS
+
+        // count number of mines adjacent to tile
         public int CountAdjacentMines()
         {
             var adjacentTiles = Game.Map.GetAdjacentTiles(this);
@@ -37,6 +39,7 @@ namespace MinesweeperRLNetPT.Core
             return mineCount;
         }
 
+        // count number of flags adjacent to tile
         public int CountAdjacentFlags()
         {
             var adjacentTiles = Game.Map.GetAdjacentTiles(this);
@@ -45,6 +48,7 @@ namespace MinesweeperRLNetPT.Core
             return flagCount;
         }
 
+        // draw tile at position to console
         public void Draw(RLConsole console)
         {
             if (Game.IsPlaying)
@@ -83,6 +87,7 @@ namespace MinesweeperRLNetPT.Core
             }
         }
 
+        // reveal tile, check if mine
         public void Reveal()
         {
             if (!IsRevealed)
@@ -110,12 +115,14 @@ namespace MinesweeperRLNetPT.Core
             }
         }
 
+        // toggle flag and update color
         public void ToggleFlag()
         {
             IsFlagged = !IsFlagged;
             UpdateColor();
         }
 
+        // toggle highlighted (hovered tile)
         public void ToggleHighlight()
         {
             IsHighlighted = !IsHighlighted;
@@ -156,17 +163,21 @@ namespace MinesweeperRLNetPT.Core
         }
 
         // PRIVATE METHODS
+
+        // set symbol at tiles position
         private void SetConsoleSymbol(RLConsole console, int symbol)
         {
             console.Set(X, Y, Color, BgColor, symbol);
         }
 
+        // set symbol based on number of mines
         private void SetConsoleSymbolFromAdjMines(RLConsole console)
         {
             int charIndex = AdjacentMines + 48;
             SetConsoleSymbol(console, charIndex);
         }
 
+        // update color based on flag, mine, undiscovered, number
         private void UpdateColor()
         {
             if (IsFlagged)
@@ -187,6 +198,7 @@ namespace MinesweeperRLNetPT.Core
             }
         }
 
+        // update background color based on highlighted
         private void UpdateBgColor()
         {
             if (IsHighlighted)
